@@ -1,0 +1,123 @@
+## venv using pipenv
+pip isntall pipenv
+pipenv install <package>
+pipenv shell to start working in the venv
+
+
+## initial steps
+#1 create a new django project
+#2 create a new app
+#3 update settings.py
+
+## start a new django Project (don't forget to use . to avoid creating a new directory)
+django-admin startproject helloworld_project .
+
+## Start an app
+python manage.py startapp pages
+then, add this app in the settings.py file of our project, in the INSTALLED_APPS list (app.apps.PagesConfig)
+/////////////////////////////////////////////////////////////////////////////////
+# views -> what content is displayed on a given page
+# urls -> where that content is going (we need to create a urls.py in our app)
+from django.urls import path
+# urls(project) -> each app needs its own route
+///////////////////////////////////////////////////////////////////////////////
+
+## DB
+python manage.py migrate (create an sqlite db)
+#db model
+app/models.py -> a new class is a database model
+#1 python manage.py makemigrations appname
+#2 python manage.py migrate appname
+
+## Django Admin
+create superuser -> python manage.py createsuperuser
+modify app/admin.py to be able to see app in the admin page ->
+     from .models import model_name
+     admin.site.register(model_name)
+
+## start server
+python manage.py runserver
+
+## templates -> where HTML code lives
+#1 create a single project-level templates directory
+#2 update settings.py file, TEMPLATES list -> "DIRS": [os.path.join(BASE_DIR,'templates')],
+
+# class-based views
+#1 update the app/views.py file -> from dgango.views.generic import TemplateView
+#2 create a class that will point to our html file -> class HomePageView(TemplateView):tempalte_name='home.html'
+
+## URLs
+#1 update the project-level urls.py file -> in urlpatterns list add another path with include, pointing to app.url ->  path('', include('pages.urls'))
+#2 create the app-level urls.py file ->
+    from django.urls import path
+    from .views import HomePageView (this is the class that we created above)
+    urlpatterns = [path('', HomePageView.as_view(), name='home')] (don't forget to add "as_view()" at the end of view name)
+
+## Extending Templates
+#1 create a base.html file
+#2 extend the rest of the html files ->
+    {% extends 'base.html' %}
+    {% block content %}
+    <h1> HomePage
+    {% endblock content %}
+
+## Static files
+# create a directory in the project-level called static
+# update settings.py STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# CSS
+# create a css directory in the static directory
+# crate a base.css file
+# {% load static %} in our base.html file
+
+## Log in
+#1 update the project-level urls.py -> path('accounts/',include('django.contrib.auth.urls'))
+#2 create directory "registration" in the "templates" folder and in this directory file "login.html"
+#3 redirect the user upon successful request -> in settings.py file add LOGIN_REDIRECT_URL = 'home'
+
+## Sign up
+#1 create a new app accounts -> python manage.py startapp accounts
+#2 add the new app to the INSTALLED_APPS in settings.py file
+#3 add a project-level url pointing to the new app
+#4 crate the urls.py file in the app
+#5 from .views import SignUpView
+#6 now go to views and create the class
+#7 create signup.html file in the templates directory
+
+## Users Model
+#1 settings.py -> add the users app in the INSTALLED_APPS list
+#2 update users/models.py -> create a class that inherits from AbstractUser ->
+    from django.contrib.auth.models import AbstractUser
+    from django.db import models
+#3 create a forms.py file in users directory
+#4 update admin.py file in the users app
+#5 update settings.py file -> AUTH_USER_MODEL = 'YourAppName.YourClassName'
+
+
+# Tests
+#1 update the app.tests.py
+#2 run test -> python manage.py test
+
+# GIT
+#1 create a repository in github
+#2 create a .gitignore file
+#3 git commands to push reposotory ->
+    git init
+    git add -A
+    git commit -m "initial commit"
+    git remote add origin https://github.com/kosmas9/django_for_beginners.git
+    git branch -M main
+    git push -u origin main
+
+# HEROKU
+#1 install heroku cli
+#2 in the venv-> heroku login
+### update Pipfile.lock -> pipenv lock
+#3 create Procfile -> web: gunicorn helloworld.wsgi --log-file -
+#4 install gunicorn -> pipenv install gunicorn
+#5 update settings.py -> ALLOWED_HOSTS = ['*']
+#6 create new app -> heroku create
+#6.a ignore static files -> heroku config:set DISABLE_COLLECTSTATIC=1
+#7 push to heroku -> git push heroku main
+git push heroku testbranch:main
+#8 make app live -> heroku ps:scale web=1
+#9 heroku open
