@@ -107,6 +107,9 @@ python manage.py runserver
     git remote add origin https://github.com/kosmas9/django_for_beginners.git
     git branch -M main
     git push -u origin main
+    # change branch and create it at the same time
+    git checkout -b <name of branch>
+
 
 # HEROKU
 #1 install heroku cli
